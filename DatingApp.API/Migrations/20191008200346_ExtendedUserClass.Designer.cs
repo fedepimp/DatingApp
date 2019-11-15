@@ -63,7 +63,7 @@ namespace DatingApp.API.Migrations
 
                     b.Property<DateTime>("LastActive");
 
-                    b.Property<string>("LookinFor");
+                    b.Property<string>("LookingFor");
 
                     b.Property<byte[]>("PasswordHash");
 
