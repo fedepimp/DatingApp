@@ -32,30 +32,31 @@ export class PhotoEditorComponent implements OnInit {
   }
 
   initializeUploader() {
+    this.uploader = new FileUploader({
+      url: this.baseUrl + 'users/' + this.authService.decodedToken.nameid + '/photos',
+      authToken: 'Bearer ' + localStorage.getItem('token'),
+      isHTML5: true,
+      allowedFileType: ['image'],
+      removeAfterUpload: true,
+      autoUpload: false,
+      maxFileSize: 10 * 1024 * 1024
+    });
     // this.uploader = new FileUploader({
     //   url: this.baseUrl + 'users/' + this.authService.decodedToken.nameid + '/photos',
     //   authToken: 'Bearer ' + localStorage.getItem('token'),
-    //   isHTML5: true,
-    //   allowedFileType: ['image'],
-    //   removeAfterUpload: true,
-    //   autoUpload: false,
-    //   maxFileSize: 10 * 1024 * 1024
+    //   disableMultipart: true, // 'DisableMultipart' must be 'true' for formatDataFunction to be called.
+    //   formatDataFunctionIsAsync: true,
+    //   formatDataFunction: async (item) => {
+    //     return new Promise( (resolve, reject) => {
+    //       resolve({
+    //         name: item._file.name,
+    //         length: item._file.size,
+    //         contentType: item._file.type,
+    //         date: new Date()
+    //       });
+    //     });
+    //   }
     // });
-    this.uploader = new FileUploader({
-      url: this.baseUrl + 'users/' + this.authService.decodedToken.nameid + '/photos',
-      disableMultipart: true, // 'DisableMultipart' must be 'true' for formatDataFunction to be called.
-      formatDataFunctionIsAsync: true,
-      formatDataFunction: async (item) => {
-        return new Promise( (resolve, reject) => {
-          resolve({
-            name: item._file.name,
-            length: item._file.size,
-            contentType: item._file.type,
-            date: new Date()
-          });
-        });
-      }
-    });
     this.hasBaseDropZoneOver = false;
     this.hasAnotherDropZoneOver = false;
     this.response = '';
@@ -74,6 +75,11 @@ export class PhotoEditorComponent implements OnInit {
           isMain: res.isMain
         };
         this.photos.push(photo);
+        if (photo.isMain) {
+          this.authService.changeMemberPhoto(photo.url);
+          this.authService.currentUser.photoUrl = photo.url;
+          localStorage.setItem('user', JSON.stringify(this.authService.currentUser));
+        }
       }
     };
   }
